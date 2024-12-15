@@ -6,10 +6,14 @@ Assignment:
 #include <stdio.h>
 #include <string.h>
 
+#define NUM_OF_COLUMNS 5
+
 void task1RobotPaths();
-int robot_path(int x, int y);
+int robot_path(int row, int column);
 
 void task2HumanPyramid();
+float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int row, int column);
+
 void task3ParenthesisValidator();
 void task4QueensBattle();
 void task5CrosswordGenerator();
@@ -65,23 +69,70 @@ int main()
 void task1RobotPaths()
 {
     printf("Please enter the coordinates of the robot (column, row):\n");
-    int x, y;
-    scanf("%d %d", &y, &x);
-    int num_path = robot_path(x, y);
+    int row, column;
+    scanf("%d %d", &column, &row);
+    int num_path = robot_path(row, column);
     printf("The total number of paths the robot can take to reach home is: %d\n", num_path);
 }
 
-int robot_path(int x, int y) {
-    if (x < 0 || y < 0)
+int robot_path(int row, int column) {
+    if (row < 0 || column < 0)
         return 0;
-    if (x == 0 && y == 0)
+    if (row == 0 && column == 0)
         return 1;
-    return robot_path(x - 1, y) + robot_path(x, y - 1);
+    return robot_path(row - 1, column) + robot_path(row, column - 1);
 }
 
 void task2HumanPyramid()
 {
-    // Todo
+    float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS] = {0}; // the pyramid will be shown as matrix
+    printf("Please enter the weights of the cheerleaders:\n");
+    
+    // fill in the matrix
+    for (int i = 0; i < NUM_OF_COLUMNS; i++) {
+        for (int j = 0; j <= i; j++) {
+            if (scanf("%f", &human_pyramid[i][j]) != 1 || human_pyramid[i][j] < 0) {
+                printf("Negative weights are not supported.\n");
+                return;
+            }
+        }
+    }
+    
+    printf("The total weight supported by each cheerleader:\n");
+    // do the recurtion and print the answer from bottom row to top
+    for (int i = 0; i < NUM_OF_COLUMNS; i++) {
+        for (int j = 0; j <= i; j++) {
+            float cheerleader_weight = calculate_weight(human_pyramid, i, j);
+            printf("%.2f ", cheerleader_weight);
+        }
+        printf("\n");
+    }
+}
+
+float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int row, int column) {
+    // if the row is 0 it means it is the top cheerleader and you can return the weight as it is
+    if (row == 0 && column == 0) {
+        return human_pyramid[row][column];
+    }
+
+    // base weight
+    float cheerleader_weight = human_pyramid[row][column];
+
+    // if it has a row above
+    if (row > 0) {
+        // if it has a column on the left
+        if (column > 0) {
+            // add half of the weight of the cee above (after adding the rest of the weight from cheerleaders from above the person above)
+            cheerleader_weight += calculate_weight(human_pyramid, row - 1, column - 1) / 2;
+        }
+        // if it has a calumn on the right
+        if (column < row) {
+            // add half of the weight of the cee above (after adding the rest of the weight from cheerleaders from above the person above)
+            cheerleader_weight += calculate_weight(human_pyramid, row - 1, column) / 2;
+        }
+    }
+
+    return cheerleader_weight;
 }
 
 void task3ParenthesisValidator()
