@@ -7,6 +7,8 @@ Assignment:
 #include <string.h>
 
 void task1RobotPaths();
+int robot_path(int x, int y);
+
 void task2HumanPyramid();
 void task3ParenthesisValidator();
 void task4QueensBattle();
@@ -62,7 +64,19 @@ int main()
 
 void task1RobotPaths()
 {
-    // Todo
+    printf("Please enter the coordinates of the robot (column, row):\n");
+    int x, y;
+    scanf("%d %d", &y, &x);
+    int num_path = robot_path(x, y);
+    printf("The total number of paths the robot can take to reach home is: %d\n", num_path);
+}
+
+int robot_path(int x, int y) {
+    if (x < 0 || y < 0)
+        return 0;
+    if (x == 0 && y == 0)
+        return 1;
+    return robot_path(x - 1, y) + robot_path(x, y - 1);
 }
 
 void task2HumanPyramid()
