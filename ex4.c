@@ -15,6 +15,8 @@ void task2HumanPyramid();
 float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int row, int column);
 
 void task3ParenthesisValidator();
+int validate_parent(char validate[100], int current_place, char end_char);
+
 void task4QueensBattle();
 void task5CrosswordGenerator();
 
@@ -137,7 +139,51 @@ float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int 
 
 void task3ParenthesisValidator()
 {
-    // Todo
+    char validate[100];
+    for (int i = 0; i < 99; i++) {  // Leave space for '\0'
+        if (scanf("%c", &validate[i]) != 1 || validate[i] == '\n') {
+            validate[i] = '\0';  // Safely terminate the string
+            break;
+        }
+    }
+    printf("%s", validate);
+    
+    // check the array from start till you find '\0'
+    if (validate_parent(validate, 0, '\0')) {
+      printf("good");
+    }
+    else
+      printf("bad");
+}
+
+int validate_parent(char validate[100], int current_place, char end_char) {
+  if (validate[current_place] == '\0') {
+        // check if the wanted end_char is '\0' (we change the end_char in the middle)
+        return end_char == '\0';
+    }
+
+  char current_char = validate[current_place];
+  
+  switch (current_char) {
+        case '(':
+            if (!validate_parent(validate, current_place + 1, ')')) return 0;
+            break;
+        case '[':
+            if (!validate_parent(validate, current_place + 1, ']')) return 0;
+            break;
+        case '{':
+            if (!validate_parent(validate, current_place + 1, '}')) return 0;
+            break;
+        case '<':
+            if (!validate_parent(validate, current_place + 1, '>')) return 0;
+            break;
+        case ')': case ']': case '}': case '>':
+            // If we encounter a closing parenthesis, check if it matches
+            return current_char == end_char && validate_parent(validate, current_place + 1, '\0');
+        default:
+            // Ignore non-parenthesis characters
+            return validate_parent(validate, current_place + 1, end_char);
+    }
 }
 
 void task4QueensBattle()
