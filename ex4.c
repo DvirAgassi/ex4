@@ -139,14 +139,15 @@ float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int 
 
 void task3ParenthesisValidator()
 {
+    // random string length idk
     char validate[100];
-    for (int i = 0; i < 99; i++) {  // Leave space for '\0'
-        if (scanf("%c", &validate[i]) != 1 || validate[i] == '\n') {
-            validate[i] = '\0';  // Safely terminate the string
+    // enter the string the user entered inside the char array with '\0' at the end to show wehre is the end of it
+    for (int i = 0; i < 99; i++) {
+        if (scanf("%c", validate[i] == '\n')) {
+            validate[i] = '\0';
             break;
         }
     }
-    printf("%s", validate);
     
     // check the array from start till you find '\0'
     if (validate_parent(validate, 0, '\0')) {
@@ -163,8 +164,10 @@ int validate_parent(char validate[100], int current_place, char end_char) {
     }
 
   char current_char = validate[current_place];
-  
+
+    // check if the char is a start parenthese, an end one, or smt else
   switch (current_char) {
+      // if it is start of paren, check for the matching end
         case '(':
             if (!validate_parent(validate, current_place + 1, ')')) return 0;
             break;
@@ -178,10 +181,10 @@ int validate_parent(char validate[100], int current_place, char end_char) {
             if (!validate_parent(validate, current_place + 1, '>')) return 0;
             break;
         case ')': case ']': case '}': case '>':
-            // If we encounter a closing parenthesis, check if it matches
+            // if it is the end one, check if it is matching the start
             return current_char == end_char && validate_parent(validate, current_place + 1, '\0');
         default:
-            // Ignore non-parenthesis characters
+            // if it is non-paren, skip to the next character
             return validate_parent(validate, current_place + 1, end_char);
     }
 }
