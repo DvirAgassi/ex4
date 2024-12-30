@@ -19,7 +19,15 @@ float calculate_weight(float human_pyramid[NUM_OF_COLUMNS][NUM_OF_COLUMNS], int 
 void task3ParenthesisValidator();
 int validate_parent(char validate[], char paren_array[], int i, int current_place);
 
+int dim;
+int solution = 0; // if found solution already
+#define MAX_AREAS 256  // num of ascii characters that a user can use in the board
+char used_area[MAX_AREAS];
 void task4QueensBattle();
+int place_queens(char board[][dim], char filled_board[][dim], int row);
+int is_safe(char board[][dim], char filled_board[][dim], int row, int col);
+void print_board(char filled_board[][dim]);
+
 void task5CrosswordGenerator();
 
 int main()
@@ -209,7 +217,115 @@ int validate_parent(char validate[], char paren_array[], int i, int current_plac
 
 void task4QueensBattle()
 {
-    // Todo
+    printf("Please enter the board dimensions:\n");
+    scanf("%d", &dim);
+
+    printf("Please enter the %d*%d puzzle board:\n", dim, dim);
+    char board[dim][dim];
+    char filled_board[dim][dim];
+
+    // Initialize area_occupied array to zero (manually)
+    for (int i = 0; i < MAX_AREAS; i++) {
+        used_area[i] = 0;
+    }
+
+    // Read the board configuration
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            char c;
+            do {
+                c = getchar();
+            } while (c == ' ' || c == '\n');
+            board[i][j] = c;
+            filled_board[i][j] = '.';
+        }
+    }
+
+    if (!place_queens(board, filled_board, 0)) {
+        printf("This puzzle cannot be solved.\n");
+    }
+    else
+        print_board(filled_board);
+}
+
+// place the queens
+int place_queens(char board[][dim], char filled_board[][dim], int row) {
+    // if thw row is same as dim it means all queens are placed. so make the solution to 1, and then when you go back in recursion you dont need to make the x to dot but keep as x
+    if (row == dim || solution == 1) {
+        solution = 1;
+        return 1;
+    }
+
+    int found_solution = 0;
+
+    for (int col = 0; col < dim; col++) {
+        if (is_safe(board, filled_board, row, col)) {
+            filled_board[row][col] = 'X';
+
+            // show it as used "area" in the area array
+            for (int i = 0; i < MAX_AREAS; i++) {
+                if (used_area[i] == 0) {
+                    used_area[i] = board[row][col];
+                    break;
+                }
+            }
+
+            // go to the next row
+            found_solution = place_queens(board, filled_board, row + 1) || found_solution;
+            
+            // if you found the solution no need to make it a dot anymore
+            if (solution != 1) {
+                filled_board[row][col] = '.';
+                for (int i = 0; i < MAX_AREAS; i++) {
+                    if (used_area[i] == board[row][col]) {
+                        used_area[i] = 0; // Mark the area as unoccupied
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return found_solution;
+}
+
+// check if it is ok to put the queen here
+int is_safe(char board[][dim], char filled_board[][dim], int row, int col) {
+    char area = board[row][col];
+
+    // check if there is already a queen on the same "area"
+    for (int i = 0; i < MAX_AREAS; i++) {
+        if (used_area[i] == area) {
+            return 0;
+        }
+    }
+
+    // check if in the column you alr have a queen
+    for (int i = 0; i < row; i++) {
+        if (filled_board[i][col] == 'X') {
+            return 0;
+        }
+    }
+
+    // check diagonals
+    if (row > 0 && col > 0 && filled_board[row - 1][col - 1] == 'X') {
+        return 0;
+    }
+    if (row > 0 && col < dim - 1 && filled_board[row - 1][col + 1] == 'X') {
+        return 0;
+    }
+    
+    return 1;
+}
+
+void print_board(char filled_board[][dim]) {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            printf("%c ", filled_board[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
 void task5CrosswordGenerator()
