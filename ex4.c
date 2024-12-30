@@ -39,7 +39,9 @@ typedef struct {
 void task5CrosswordGenerator();
 int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]);
 void place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot);
+int can_place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot);
 int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]);
+
 
 int main()
 {
