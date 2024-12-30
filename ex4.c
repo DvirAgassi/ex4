@@ -319,6 +319,7 @@ int is_safe(char board[][dim], char filled_board[][dim], int row, int col) {
 }
 
 void print_board(char filled_board[][dim]) {
+    printf("Solution:\n");
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
             printf("%c ", filled_board[i][j]);
