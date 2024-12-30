@@ -123,11 +123,12 @@ void task2HumanPyramid()
         }
     }
     
-    printf("The total weight on each cheerleader:\n");
+    printf("The total weight on each cheerleader is:\n");
     // do the recurtion and print the answer from bottom row to top
     for (int i = 0; i < NUM_OF_COLUMNS; i++) {
         for (int j = 0; j <= i; j++) {
             float cheerleader_weight = calculate_weight(human_pyramid, i, j);
+            cheerleader_weight = (int)(cheerleader_weight * 100 + 0.5) / 100.0;
             printf("%.2f ", cheerleader_weight);
         }
         printf("\n");
