@@ -28,7 +28,18 @@ int place_queens(char board[][dim], char filled_board[][dim], int row);
 int is_safe(char board[][dim], char filled_board[][dim], int row, int col);
 void print_board(char filled_board[][dim]);
 
+#define MAX_ARRAY_SIZE 30
+#define MAX_SLOT_SIZE 100
+#define MAX_WORDS 100
+#define MAX_WORD_LENGTH 15
+typedef struct {
+    int row, col, length;
+    char direction; // 'H' for horizontal, 'V' for vertical
+} Slot;
 void task5CrosswordGenerator();
+int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]);
+void place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot);
+int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]);
 
 int main()
 {
@@ -331,5 +342,118 @@ void print_board(char filled_board[][dim]) {
 
 void task5CrosswordGenerator()
 {
-    // Todo
+    int size, num_slots, num_words;
+    Slot slots[MAX_SLOT_SIZE];
+    char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE];
+    char words[MAX_WORDS][MAX_WORD_LENGTH];
+    int used[MAX_WORDS] = {0}; // Tracks used words
+
+    // Input the size of the array
+    printf("Please enter the dimensions of the crossword grid:\n");
+    scanf("%d", &size);
+
+    // Input the number of slots
+    printf("Please enter the number of slots in the crossword:\n");
+    scanf("%d", &num_slots);
+
+    // Input slot details
+    printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
+    for (int i = 0; i < num_slots; i++) {
+        scanf("%d %d %d %c", &slots[i].row, &slots[i].col, &slots[i].length, &slots[i].direction);
+    }
+
+    // Input the number of words
+    printf("Please enter the number of words in the dictionary:\n");
+    scanf("%d", &num_words);
+    while (num_words < num_slots) {
+        printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n", num_slots);
+        scanf("%d", &num_words);
+    }
+
+    // Input the words
+    printf("Please enter the words for the dictionary:\n");
+    for (int i = 0; i < num_words; i++) {
+        scanf("%s", words[i]);
+    }
+
+    // Initialize the array
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            array[i][j] = '#'; // Fill with empty cells
+        }
+    }
+
+    // Solve the crossword
+    if (solve_crossword(array, slots, num_slots, words, num_words, 0, used)) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                char cell = array[i][j];
+                if (cell >= 'a' && cell <= 'z') {
+                    cell -= 'a' - 'A'; // Convert to uppercase
+                }
+                printf("| %c ", cell);
+            }
+            printf("|\n");
+        }
+    } else {
+        printf("This crossword cannot be solved.\n");
+    }
+}
+
+int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]) {
+    if (word_index == num_slots) {
+        return 1; // All slots filled
+    }
+
+    for (int i = 0; i < num_words; i++) {
+        if (!used[i] && can_place_word(array, words, i, slots[word_index])) {
+            place_word(array, words, i, slots[word_index]);
+            used[i] = 1; // Mark word as used
+
+            if (solve_crossword(array, slots, num_slots, words, num_words, word_index + 1, used)) {
+                return 1; // Solution found
+            }
+
+            // Backtrack: remove the word
+            for (int j = 0; j < slots[word_index].length; j++) {
+                int r = slots[word_index].row + (slots[word_index].direction == 'V' ? j : 0);
+                int c = slots[word_index].col + (slots[word_index].direction == 'H' ? j : 0);
+                array[r][c] = '#';
+            }
+            used[i] = 0; // Unmark word as used
+        }
+    }
+    return 0; // No solution found
+}
+
+void place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot) {
+    for (int i = 0; i < slot.length; i++) {
+        int r = slot.row + (slot.direction == 'V' ? i : 0);
+        int c = slot.col + (slot.direction == 'H' ? i : 0);
+        array[r][c] = words[word_index][i];
+    }
+}
+
+int can_place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot) {
+    for (int i = 0; i < slot.length; i++) {
+        int r = slot.row + (slot.direction == 'V' ? i : 0);
+        int c = slot.col + (slot.direction == 'H' ? i : 0);
+
+        // Convert array character to uppercase
+        char array_char = array[r][c];
+        if (array_char >= 'a' && array_char <= 'z') {
+            array_char -= 'a' - 'A';
+        }
+
+        // Convert word character to uppercase
+        char word_char = words[word_index][i];
+        if (word_char >= 'a' && word_char <= 'z') {
+            word_char -= 'a' - 'A';
+        }
+
+        if (array_char != '#' && array_char != word_char) {
+            return 0; // Conflict found
+        }
+    }
+    return 1; // No conflict
 }
