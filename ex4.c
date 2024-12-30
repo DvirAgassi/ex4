@@ -1,7 +1,7 @@
 /******************
-Name:
-ID:
-Assignment:
+Name: Dvir Agaasi
+ID: 215786328
+Assignment: ex4
 *******************/
 #include <stdio.h>
 #include <string.h>
@@ -233,7 +233,7 @@ void task4QueensBattle()
     printf("Please enter the board dimensions:\n");
     scanf("%d", &dim);
 
-    printf("Please enter the %d*%d puzzle board:\n", dim, dim);
+    printf("Please enter a %d*%d puzzle board:\n", dim, dim);
     char board[dim][dim];
     char filled_board[dim][dim];
 
@@ -250,7 +250,7 @@ void task4QueensBattle()
                 c = getchar();
             } while (c == ' ' || c == '\n');
             board[i][j] = c;
-            filled_board[i][j] = '.';
+            filled_board[i][j] = '*';
         }
     }
 
@@ -263,7 +263,8 @@ void task4QueensBattle()
 
 // place the queens
 int place_queens(char board[][dim], char filled_board[][dim], int row) {
-    // if thw row is same as dim it means all queens are placed. so make the solution to 1, and then when you go back in recursion you dont need to make the x to dot but keep as x
+    /* if thw row is same as dim it means all queens are placed. so make the solution to 1,
+    and then when you go back in recursion you dont need to make the x to dot but keep as x*/
     if (row == dim || solution == 1) {
         solution = 1;
         return 1;
@@ -283,15 +284,16 @@ int place_queens(char board[][dim], char filled_board[][dim], int row) {
                 }
             }
 
-            // go to the next row
+            // go to next row
             found_solution = place_queens(board, filled_board, row + 1) || found_solution;
             
             // if you found the solution no need to make it a dot anymore
             if (solution != 1) {
-                filled_board[row][col] = '.';
+                filled_board[row][col] = '*';
                 for (int i = 0; i < MAX_AREAS; i++) {
+                    // make the area back to  not used
                     if (used_area[i] == board[row][col]) {
-                        used_area[i] = 0; // Mark the area as unoccupied
+                        used_area[i] = 0;
                         break;
                     }
                 }
@@ -346,25 +348,21 @@ void task5CrosswordGenerator()
 {
     int size, num_slots, num_words;
     Slot slots[MAX_SLOT_SIZE];
-    char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE];
-    char words[MAX_WORDS][MAX_WORD_LENGTH];
-    int used[MAX_WORDS] = {0}; // Tracks used words
+    char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE]; // the board
+    char words[MAX_WORDS][MAX_WORD_LENGTH]; // words user put
+    int used[MAX_WORDS] = {0}; // used words
 
-    // Input the size of the array
     printf("Please enter the dimensions of the crossword grid:\n");
     scanf("%d", &size);
 
-    // Input the number of slots
     printf("Please enter the number of slots in the crossword:\n");
     scanf("%d", &num_slots);
 
-    // Input slot details
     printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
     for (int i = 0; i < num_slots; i++) {
         scanf("%d %d %d %c", &slots[i].row, &slots[i].col, &slots[i].length, &slots[i].direction);
     }
 
-    // Input the number of words
     printf("Please enter the number of words in the dictionary:\n");
     scanf("%d", &num_words);
     while (num_words < num_slots) {
@@ -372,26 +370,25 @@ void task5CrosswordGenerator()
         scanf("%d", &num_words);
     }
 
-    // Input the words
     printf("Please enter the words for the dictionary:\n");
     for (int i = 0; i < num_words; i++) {
         scanf("%s", words[i]);
     }
 
-    // Initialize the array
+    // start the board will all to #
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            array[i][j] = '#'; // Fill with empty cells
+            array[i][j] = '#';
         }
     }
 
-    // Solve the crossword
+    // solve it
     if (solve_crossword(array, slots, num_slots, words, num_words, 0, used)) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 char cell = array[i][j];
                 if (cell >= 'a' && cell <= 'z') {
-                    cell -= 'a' - 'A'; // Convert to uppercase
+                    cell -= 'a' - 'A'; // to uppercase
                 }
                 printf("| %c ", cell);
             }
@@ -404,31 +401,32 @@ void task5CrosswordGenerator()
 
 int solve_crossword(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], Slot slots[MAX_SLOT_SIZE], int num_slots, char words[MAX_WORDS][MAX_WORD_LENGTH], int num_words, int word_index, int used[MAX_WORDS]) {
     if (word_index == num_slots) {
-        return 1; // All slots filled
+        return 1; // all slots filled
     }
 
     for (int i = 0; i < num_words; i++) {
         if (!used[i] && can_place_word(array, words, i, slots[word_index])) {
             place_word(array, words, i, slots[word_index]);
-            used[i] = 1; // Mark word as used
+            used[i] = 1; // mark word as used
 
             if (solve_crossword(array, slots, num_slots, words, num_words, word_index + 1, used)) {
-                return 1; // Solution found
+                return 1;
             }
 
-            // Backtrack: remove the word
+            // it didnt work so remove the word from her place and continue with the rest
             for (int j = 0; j < slots[word_index].length; j++) {
                 int r = slots[word_index].row + (slots[word_index].direction == 'V' ? j : 0);
                 int c = slots[word_index].col + (slots[word_index].direction == 'H' ? j : 0);
                 array[r][c] = '#';
             }
-            used[i] = 0; // Unmark word as used
+            used[i] = 0; // unuse the word
         }
     }
-    return 0; // No solution found
+    return 0; // no solution
 }
 
 void place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot) {
+    // place the word in the board
     for (int i = 0; i < slot.length; i++) {
         int r = slot.row + (slot.direction == 'V' ? i : 0);
         int c = slot.col + (slot.direction == 'H' ? i : 0);
@@ -436,26 +434,26 @@ void place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS
     }
 }
 
+// check if possible to put the word there
 int can_place_word(char array[MAX_ARRAY_SIZE][MAX_ARRAY_SIZE], char words[MAX_WORDS][MAX_WORD_LENGTH], int word_index, Slot slot) {
     for (int i = 0; i < slot.length; i++) {
         int r = slot.row + (slot.direction == 'V' ? i : 0);
         int c = slot.col + (slot.direction == 'H' ? i : 0);
 
-        // Convert array character to uppercase
+        // make it uppercase
         char array_char = array[r][c];
         if (array_char >= 'a' && array_char <= 'z') {
             array_char -= 'a' - 'A';
         }
 
-        // Convert word character to uppercase
         char word_char = words[word_index][i];
         if (word_char >= 'a' && word_char <= 'z') {
             word_char -= 'a' - 'A';
         }
 
         if (array_char != '#' && array_char != word_char) {
-            return 0; // Conflict found
+            return 0;
         }
     }
-    return 1; // No conflict
+    return 1; // found solution
 }
